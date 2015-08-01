@@ -4,8 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,8 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class JsonFeedActivity extends AppCompatActivity {
+public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefreshLayout.OnRefreshListener{
 
+    private SwipeRefreshLayout mSwiptLayout;
     private ArrayList<Fact> mFactList;
     private FactAdapter mFactAdapter;
 
@@ -44,17 +45,31 @@ public class JsonFeedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_json_feed);
 
-        mFactAdapter=new FactAdapter(this,R.id.listView, mFactList);
+        // Config swip layout
+        mSwiptLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwiptLayout.setOnRefreshListener(this);
+        mSwiptLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
+        // Set FactAdapter to ListView
+        mFactAdapter=new FactAdapter(this,R.id.listView, mFactList);
         ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(mFactAdapter);
 
-        refresh();
+        //mSwiptLayout.setRefreshing(true);
+        onRefresh();
     }
 
     private void refresh(){
         String url="https://dl.dropboxusercontent.com/u/746330/facts.json";
         new JSonFeedTask().execute(url);
+    }
+
+    @Override
+    public void onRefresh() {
+        refresh();
     }
 
     @Override
@@ -184,10 +199,19 @@ public class JsonFeedActivity extends AppCompatActivity {
         private ProgressDialog dialog = new ProgressDialog(JsonFeedActivity.this);
         private boolean error=true;
 
+        /**
+         * Runs on the UI thread before {@link #doInBackground}.
+         *
+         * @see #onPostExecute
+         * @see #doInBackground
+         */
         @Override
         protected void onPreExecute() {
-            dialog.setMessage("Downloading ...");
-            dialog.show();
+            // Start progress dialog if refresh indicator is not running
+            if(!mSwiptLayout.isRefreshing()){
+                dialog.setMessage("Downloading ...");
+                dialog.show();
+            }
         }
 
         @Override
@@ -204,7 +228,6 @@ public class JsonFeedActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            dialog.dismiss();
 
             if(error){
                 Toast.makeText(JsonFeedActivity.this, result, Toast.LENGTH_LONG)
@@ -213,11 +236,22 @@ public class JsonFeedActivity extends AppCompatActivity {
                 // Convert string to mFactList and provide it to FactAdapter.
                 displayFeed(result);
             }
+
+            if(mSwiptLayout.isRefreshing()){
+                mSwiptLayout.setRefreshing(false);
+            }else{
+                dialog.dismiss();
+            }
         }
 
         @Override
         protected void onCancelled(String s) {
-            dialog.dismiss();
+            // Stop the refreshing indicator or progress dialog
+            if(mSwiptLayout.isRefreshing()){
+                mSwiptLayout.setRefreshing(false);
+            }else{
+                dialog.dismiss();
+            }
         }
     }
 
@@ -282,6 +316,7 @@ public class JsonFeedActivity extends AppCompatActivity {
                 }
             }
 
+            // Set FactList to FactAdapter
             mFactAdapter.setItemList(mFactList);
 
         }catch (JSONException e){
