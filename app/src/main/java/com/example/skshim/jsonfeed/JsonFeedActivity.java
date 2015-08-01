@@ -41,6 +41,7 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
     private ArrayList<Fact> mFactList;
     private FactAdapter mFactAdapter;
     private ActionBar mActionBar;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +63,7 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(mFactAdapter);
 
-        //mSwiptLayout.setRefreshing(true);
-        onRefresh();
+        refresh();
     }
 
     private void refresh(){
@@ -74,6 +74,17 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
     @Override
     public void onRefresh() {
         refresh();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // This is to prevent window leak when user turn the device while accessing internet.
+        if(mProgressDialog!=null){
+            mProgressDialog.dismiss();
+            mProgressDialog=null;
+        }
     }
 
     @Override
@@ -200,7 +211,7 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
      */
     private class JSonFeedTask extends AsyncTask<String,Void,String> {
 
-        private ProgressDialog dialog = new ProgressDialog(JsonFeedActivity.this);
+
         private boolean error=true;
 
         /**
@@ -213,8 +224,9 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         protected void onPreExecute() {
             // Start progress dialog if refresh indicator is not running
             if(!mSwiptLayout.isRefreshing()){
-                dialog.setMessage("Downloading ...");
-                dialog.show();
+                mProgressDialog= new ProgressDialog(JsonFeedActivity.this);
+                mProgressDialog.setMessage("Downloading ...");
+                mProgressDialog.show();
             }
         }
 
@@ -244,7 +256,8 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
             if(mSwiptLayout.isRefreshing()){
                 mSwiptLayout.setRefreshing(false);
             }else{
-                dialog.dismiss();
+                mProgressDialog.dismiss();
+                mProgressDialog=null;
             }
         }
 
@@ -254,7 +267,8 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
             if(mSwiptLayout.isRefreshing()){
                 mSwiptLayout.setRefreshing(false);
             }else{
-                dialog.dismiss();
+                mProgressDialog.dismiss();
+                mProgressDialog=null;
             }
         }
     }
