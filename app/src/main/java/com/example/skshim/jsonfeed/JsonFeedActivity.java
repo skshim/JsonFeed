@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,11 +40,14 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
     private SwipeRefreshLayout mSwiptLayout;
     private ArrayList<Fact> mFactList;
     private FactAdapter mFactAdapter;
+    private ActionBar mActionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_json_feed);
+
+        mActionBar=getSupportActionBar();
 
         // Config swip layout
         mSwiptLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -305,6 +309,9 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
             responseObj=new JSONObject(result);
             String mainTitle=responseObj.getString("title");
             JSONArray rowItems=responseObj.getJSONArray("rows");
+
+            // Update title from json.
+            mActionBar.setTitle(mainTitle);
 
             mFactList =new ArrayList<Fact>();
             Fact rowItem;
