@@ -19,12 +19,19 @@ import java.util.List;
 
 public class JsonFeedActivity extends AppCompatActivity {
 
+    private ArrayList<Fact> mFactList;
+    private FactAdapter mFactAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_json_feed);
 
+        mFactAdapter=new FactAdapter(this,R.id.listView, mFactList);
+
         ListView listView = (ListView)findViewById(R.id.listView);
+        listView.setAdapter(mFactAdapter);
+
     }
 
     @Override
