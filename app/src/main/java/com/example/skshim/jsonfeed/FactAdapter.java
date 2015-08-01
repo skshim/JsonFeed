@@ -27,11 +27,13 @@ public class FactAdapter extends ArrayAdapter<Fact> {
 
     private List<Fact> mItemList;
     private Context mContext;
+    private ImageLoader mImageLoader;
 
     public FactAdapter(Context context, int resource, ArrayList<Fact> facts){
         super(context,resource,facts);
         mContext=context;
         mItemList=facts;
+        mImageLoader= new ImageLoader(context);
     }
 
     /**
@@ -102,10 +104,12 @@ public class FactAdapter extends ArrayAdapter<Fact> {
         holder.title.setText((fact.getTitle() != null ? fact.getTitle() : ""));
         holder.description.setText((fact.getDescription()!=null?fact.getDescription():""));
         if(fact.getImageHref()==null){
+            // remove from the list if image link doesn't exist
             holder.imageView.setVisibility(View.GONE);
         }else{
-            // load the imageView asynchronously into the ImageView
             holder.imageView.setVisibility(View.VISIBLE);
+            // load the imageView asynchronously into the ImageView
+            mImageLoader.loadImage(fact.getImageHref(),holder.imageView);
         }
 
         return convertView;
