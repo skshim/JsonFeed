@@ -1,21 +1,14 @@
 package com.example.skshim.jsonfeed;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -32,10 +25,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
-public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefreshLayout.OnRefreshListener{
+public class FactListActivity extends AppCompatActivity implements  SwipeRefreshLayout.OnRefreshListener{
 
     private SwipeRefreshLayout mSwiptLayout;
     private ArrayList<Fact> mFactList;
@@ -133,103 +125,6 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
     }
 
     /**
-     * FactAdapter : The main adapter that backs the ListView.
-     */
-    private class FactAdapter extends ArrayAdapter<Fact> {
-
-        //
-        private class ViewHolder{
-            TextView title;
-            TextView description;
-            ImageView imageView;
-        }
-
-        private List<Fact> mItemList;
-
-        public FactAdapter(Context context, int resource, ArrayList<Fact> facts){
-            super(context,resource,facts);
-            mItemList=facts;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getCount() {
-            if(mItemList==null){
-                return 0;
-            }else{
-                return mItemList.size();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @param position
-         */
-        @Override
-        public Fact getItem(int position) {
-            return mItemList.get(position);
-        }
-
-        /**
-         * {@inheritDoc}
-         *
-         * @param position
-         */
-        @Override
-        public long getItemId(int position) {
-            if(mItemList==null){
-                return 0;
-            }else{
-                return getItem(position).hashCode();
-            }
-        }
-
-        /**
-         *  JSon data should be converted into List<Fact> and passed to function
-         *
-         * @param itemList
-         */
-        public void setItemList(List<Fact> itemList) {
-            mItemList = itemList;
-            this.notifyDataSetChanged();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if(convertView ==null){
-                LayoutInflater layInf=(LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = layInf.inflate(R.layout.item_fact,null);
-
-                holder = new ViewHolder();
-                holder.title=(TextView)convertView.findViewById(R.id.title);
-                holder.description=(TextView)convertView.findViewById(R.id.description);
-                holder.imageView =(ImageView)convertView.findViewById(R.id.imageView);
-
-                convertView.setTag(holder);
-
-            }else{
-                holder =(ViewHolder) convertView.getTag();
-            }
-
-            Fact fact = getItem(position);
-            holder.title.setText((fact.getTitle() != null ? fact.getTitle() : ""));
-            holder.description.setText((fact.getDescription()!=null?fact.getDescription():""));
-            if(fact.getImageHref()==null){
-                holder.imageView.setVisibility(View.GONE);
-            }else{
-                // load the imageView asynchronously into the ImageView
-                holder.imageView.setVisibility(View.VISIBLE);
-            }
-
-            return convertView;
-        }
-    }
-
-    /**
      * JSonFeedTask : AsyncTask that retrieves JSon data from Web.
      */
     private class JSonFeedTask extends AsyncTask<String,Void,String> {
@@ -247,7 +142,7 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         protected void onPreExecute() {
             // Start progress dialog if refresh indicator is not running
             if(!mSwiptLayout.isRefreshing()){
-                mProgressDialog= new ProgressDialog(JsonFeedActivity.this);
+                mProgressDialog= new ProgressDialog(FactListActivity.this);
                 mProgressDialog.setMessage("Downloading ...");
                 mProgressDialog.show();
             }
@@ -269,7 +164,7 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         protected void onPostExecute(String result) {
 
             if(error){
-                Toast.makeText(JsonFeedActivity.this, result, Toast.LENGTH_LONG)
+                Toast.makeText(FactListActivity.this, result, Toast.LENGTH_LONG)
                         .show();
             }else{
                 // Convert string to mFactList and provide it to FactAdapter.
