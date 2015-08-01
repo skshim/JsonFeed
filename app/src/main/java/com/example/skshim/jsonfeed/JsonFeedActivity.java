@@ -42,6 +42,10 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
     private FactAdapter mFactAdapter;
     private ActionBar mActionBar;
     private ProgressDialog mProgressDialog;
+    private  String mTitle;
+
+    private final String KEY_TITLE="title";
+    private final String KEY_FACTLIST="fact_list";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,14 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(mFactAdapter);
 
-        refresh();
+        if(savedInstanceState==null){
+            refresh();
+        }else{
+            mTitle=savedInstanceState.getString(KEY_TITLE);
+            mActionBar.setTitle(mTitle);
+            mFactList=savedInstanceState.getParcelableArrayList(KEY_FACTLIST);
+            mFactAdapter.setItemList(mFactList);
+        }
     }
 
     private void refresh(){
@@ -76,11 +87,23 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         refresh();
     }
 
+    /**
+     * Save all appropriate fragment state.
+     *
+     * @param outState
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_TITLE, mTitle);
+        outState.putParcelableArrayList(KEY_FACTLIST, mFactList);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        // This is to prevent window leak when user turn the device while accessing internet.
+        // This is to prevent window leak when rotated while accessing internet.
         if(mProgressDialog!=null){
             mProgressDialog.dismiss();
             mProgressDialog=null;
@@ -321,11 +344,11 @@ public class JsonFeedActivity extends AppCompatActivity implements  SwipeRefresh
         try{
             Gson gson=new Gson();
             responseObj=new JSONObject(result);
-            String mainTitle=responseObj.getString("title");
+            mTitle=responseObj.getString("title");
             JSONArray rowItems=responseObj.getJSONArray("rows");
 
             // Update title from json.
-            mActionBar.setTitle(mainTitle);
+            mActionBar.setTitle(mTitle);
 
             mFactList =new ArrayList<Fact>();
             Fact rowItem;
