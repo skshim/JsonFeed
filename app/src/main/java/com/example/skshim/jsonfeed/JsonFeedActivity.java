@@ -1,17 +1,22 @@
 package com.example.skshim.jsonfeed;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+
+import java.util.List;
 
 
-public class JsonFeedActivity extends ActionBarActivity {
+public class JsonFeedActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_json_feed);
+
+        ListView listView = (ListView)findViewById(R.id.listView);
     }
 
     @Override
@@ -35,4 +40,10 @@ public class JsonFeedActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     *
+     */
+
+
 }
