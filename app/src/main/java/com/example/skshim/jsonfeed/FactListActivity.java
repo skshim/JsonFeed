@@ -1,13 +1,10 @@
 package com.example.skshim.jsonfeed;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,7 +30,6 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
     private ArrayList<Fact> mFactList;
     private FactAdapter mFactAdapter;
     private ActionBar mActionBar;
-    private ProgressDialog mProgressDialog;
     private  String mTitle;
 
     private final String KEY_TITLE="title";
@@ -91,22 +87,10 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
         outState.putParcelableArrayList(KEY_FACTLIST, mFactList);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // This is to prevent window leak when rotated while accessing internet.
-        if(mProgressDialog!=null){
-            mProgressDialog.dismiss();
-            mProgressDialog=null;
-        }
-    }
-
     /**
      * JSonFeedTask : AsyncTask that retrieves JSon data from Web.
      */
     private class JSonFeedTask extends AsyncTask<String,Void,String> {
-
 
         private boolean error=true;
 
@@ -118,11 +102,8 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
          */
         @Override
         protected void onPreExecute() {
-            // Start progress dialog if refresh indicator is not running
             if(!mSwiptLayout.isRefreshing()){
-                mProgressDialog= new ProgressDialog(FactListActivity.this);
-                mProgressDialog.setMessage("Downloading ...");
-                mProgressDialog.show();
+                mSwiptLayout.setRefreshing(true);
             }
         }
 
@@ -151,9 +132,6 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
 
             if(mSwiptLayout.isRefreshing()){
                 mSwiptLayout.setRefreshing(false);
-            }else{
-                mProgressDialog.dismiss();
-                mProgressDialog=null;
             }
         }
 
@@ -162,9 +140,6 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
             // Stop the refreshing indicator or progress dialog
             if(mSwiptLayout.isRefreshing()){
                 mSwiptLayout.setRefreshing(false);
-            }else{
-                mProgressDialog.dismiss();
-                mProgressDialog=null;
             }
         }
     }
