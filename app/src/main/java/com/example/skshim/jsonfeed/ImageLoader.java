@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -29,17 +30,57 @@ public class ImageLoader {
 
     public void loadImage(String url, ImageView imageView) {
         final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+
+        // Make a link between imageView and task that returns bitmap drawable.
+        final DrawableWithAsyncTask drawableWithAsyncTask=
+                new DrawableWithAsyncTask(mResources, null, task);
+        imageView.setImageDrawable(drawableWithAsyncTask);
+
         task.execute(url);
+    }
+
+    /**
+     * A custom Drawable that will be attached to the imageView while the work is in progress.
+     * Contains a reference to the actual worker task, so that only the last started worker process
+     * can bind its result, independently of the finish order.
+     */
+    private static class DrawableWithAsyncTask extends BitmapDrawable {
+        private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
+
+        public DrawableWithAsyncTask(Resources res, Bitmap bitmap, BitmapWorkerTask bitmapWorkerTask) {
+            super(res, bitmap);
+            bitmapWorkerTaskReference = new WeakReference<BitmapWorkerTask>(bitmapWorkerTask);
+        }
+
+        public BitmapWorkerTask getBitmapWorkerTask() {
+            return bitmapWorkerTaskReference.get();
+        }
+    }
+
+    /**
+     * Retrieve the currently active work task (if any) associated with this imageView.
+     * null if there is no such task.
+     */
+    private static BitmapWorkerTask getAttachedWorkerTask(ImageView imageView) {
+        if (imageView != null) {
+            final Drawable drawable = imageView.getDrawable();
+            if (drawable instanceof DrawableWithAsyncTask) {
+                final DrawableWithAsyncTask drawableWithAsyncTask = (DrawableWithAsyncTask) drawable;
+                return drawableWithAsyncTask.getBitmapWorkerTask();
+            }
+        }
+        return null;
     }
 
     /**
      * The actual AsyncTask that will asynchronously process the image.
      */
     private class BitmapWorkerTask extends AsyncTask<String, Void, BitmapDrawable> {
-        private String mData;
+
         private final WeakReference<ImageView> imageViewReference;
 
         public BitmapWorkerTask(ImageView imageView) {
+            // Use a WeakReference to ensure the ImageView can be garbage collected
             imageViewReference = new WeakReference<ImageView>(imageView);
         }
 
@@ -61,12 +102,30 @@ public class ImageLoader {
 
         @Override
         protected void onPostExecute(BitmapDrawable drawable) {
-            ImageView imageView = imageViewReference.get();
-            if(drawable!=null && imageView !=null){
+
+            final ImageView imageView = getAttachedImageView();
+            if (drawable != null && imageView != null) {
                 imageView.setImageDrawable(drawable);
             }else{
-                imageView.setVisibility(View.GONE);
+                if(imageView!=null){
+                    imageView.setVisibility(View.GONE);
+                }
             }
+        }
+
+        /**
+         * Returns the ImageView associated with this task as long as the ImageView's task still
+         * points to this task as well. Returns null otherwise.
+         */
+        private ImageView getAttachedImageView() {
+            final ImageView imageView = imageViewReference.get();
+            final BitmapWorkerTask bitmapWorkerTask = getAttachedWorkerTask(imageView);
+
+            if (this == bitmapWorkerTask) {
+                return imageView;
+            }
+
+            return null;
         }
     }
 
