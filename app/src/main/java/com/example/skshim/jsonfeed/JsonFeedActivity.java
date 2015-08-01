@@ -49,6 +49,12 @@ public class JsonFeedActivity extends AppCompatActivity {
         ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(mFactAdapter);
 
+        refresh();
+    }
+
+    private void refresh(){
+        String url="https://dl.dropboxusercontent.com/u/746330/facts.json";
+        new JSonFeedTask().execute(url);
     }
 
     @Override
