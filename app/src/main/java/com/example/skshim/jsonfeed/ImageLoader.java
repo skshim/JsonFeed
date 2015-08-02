@@ -26,6 +26,7 @@ public class ImageLoader {
 
     private Resources mResources;
     private MemoryCache<String, BitmapDrawable> mMemoryCache;
+    private Bitmap mLoadingBitmap;
 
     public ImageLoader(Context context){
         mResources = context.getResources();
@@ -33,6 +34,10 @@ public class ImageLoader {
 
     public void addMemoryCache(FragmentManager fragmentManager, int maxSize){
         mMemoryCache=MemoryCache.getInstance(fragmentManager, maxSize);
+    }
+
+    public void setLoadingImage(int resId) {
+        mLoadingBitmap = BitmapFactory.decodeResource(mResources, resId);
     }
 
     public void loadImage(String url, ImageView imageView) {
@@ -51,7 +56,7 @@ public class ImageLoader {
 
             // Make a link between imageView and task that returns bitmap drawable.
             final DrawableWithAsyncTask drawableWithAsyncTask=
-                    new DrawableWithAsyncTask(mResources, null, task);
+                    new DrawableWithAsyncTask(mResources, mLoadingBitmap, task);
             imageView.setImageDrawable(drawableWithAsyncTask);
 
             task.execute(url);
@@ -133,9 +138,9 @@ public class ImageLoader {
             if (drawable != null && imageView != null) {
                 imageView.setImageDrawable(drawable);
             }else{
-                if(imageView!=null){
-                    imageView.setVisibility(View.GONE);
-                }
+//                if(imageView!=null){
+//                    imageView.setVisibility(View.GONE);
+//                }
             }
         }
 

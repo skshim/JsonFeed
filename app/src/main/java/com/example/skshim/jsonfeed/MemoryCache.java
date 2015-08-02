@@ -31,10 +31,8 @@ public class MemoryCache<T, V> extends LruCache<T, V> {
             memoryCache = new MemoryCache(maxSize);
             memoryCacheHolder.setObject(memoryCache);
         }
-
         return memoryCache;
     }
-
 
     private static MemoryCacheHolder findOrCreateMemoryCacheHolder(FragmentManager fm) {
         // Check to see if we have retained the worker fragment.
@@ -45,7 +43,6 @@ public class MemoryCache<T, V> extends LruCache<T, V> {
             mHolder = new MemoryCacheHolder();
             fm.beginTransaction().add(mHolder, TAG).commitAllowingStateLoss();
         }
-
         return mHolder;
     }
 
@@ -56,9 +53,6 @@ public class MemoryCache<T, V> extends LruCache<T, V> {
     public static class MemoryCacheHolder extends Fragment {
         private Object mRestoredObject;
 
-        /**
-         * Empty constructor as per the Fragment documentation
-         */
         public MemoryCacheHolder() {}
 
         @Override

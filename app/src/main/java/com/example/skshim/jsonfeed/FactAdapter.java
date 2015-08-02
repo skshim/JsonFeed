@@ -33,8 +33,12 @@ public class FactAdapter extends ArrayAdapter<Fact> {
         super(context,resource,facts);
         mContext=context;
         mItemList=facts;
-        mImageLoader= new ImageLoader(context);
 
+        /**
+         * Create ImageLoader and config default settings.
+         */
+        mImageLoader= new ImageLoader(context);
+        mImageLoader.setLoadingImage(R.drawable.default_image);
         // Use 20% of available heap size as memory cache
         int maxSize = (int)Runtime.getRuntime().maxMemory()/5;
         mImageLoader.addMemoryCache(((FactListActivity)context).getSupportFragmentManager(),maxSize);
