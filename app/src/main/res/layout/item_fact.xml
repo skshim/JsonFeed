@@ -31,10 +31,11 @@
         android:textColor="@color/color_description" />
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/item_image_size"
+        android:layout_height="@dimen/item_image_size"
         android:id="@+id/imageView"
         android:layout_below="@+id/title"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="false" />
+        android:layout_alignParentEnd="false"
+        android:src="@drawable/default_image" />
 </RelativeLayout>
