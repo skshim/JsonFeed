@@ -1,4 +1,4 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.skshim.jsonfeed.activity.FactListActivity;
+import com.example.skshim.jsonfeed.R;
+import com.example.skshim.jsonfeed.image.ImageLoader;
+import com.example.skshim.jsonfeed.model.Fact;
 
 import java.util.ArrayList;
 import java.util.List;

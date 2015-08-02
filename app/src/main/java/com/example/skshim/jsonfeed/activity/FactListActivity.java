@@ -1,4 +1,4 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -6,6 +6,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
+
+import com.example.skshim.jsonfeed.R;
+import com.example.skshim.jsonfeed.adapter.FactAdapter;
+import com.example.skshim.jsonfeed.asynctask.FactAsyncTask;
+import com.example.skshim.jsonfeed.model.Constants;
+import com.example.skshim.jsonfeed.model.Fact;
+import com.example.skshim.jsonfeed.model.FeedResult;
 
 import java.util.ArrayList;
 

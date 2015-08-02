@@ -1,4 +1,4 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.model;
 
 /**
  * Created by Sungki Shim on 2/08/15.

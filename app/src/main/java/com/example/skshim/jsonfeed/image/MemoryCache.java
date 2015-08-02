@@ -1,4 +1,4 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.image;
 
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;

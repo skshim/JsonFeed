@@ -1,10 +1,12 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.asynctask;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.example.skshim.jsonfeed.model.Constants;
+import com.example.skshim.jsonfeed.model.FeedResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -121,7 +123,7 @@ public class FactAsyncTask extends AsyncTask<String, Void, String> {
     /**
      * Interface definition for a callback to be invoked when a feed result is received.
      */
-    public static interface OnFeedResultListener {
+    public interface OnFeedResultListener {
         public void onFeedResult(FeedResult feedResult);
     }
 }

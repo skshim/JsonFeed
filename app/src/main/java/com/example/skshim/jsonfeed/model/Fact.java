@@ -1,4 +1,4 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
