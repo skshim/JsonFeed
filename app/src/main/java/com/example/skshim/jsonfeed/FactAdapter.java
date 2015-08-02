@@ -34,6 +34,10 @@ public class FactAdapter extends ArrayAdapter<Fact> {
         mContext=context;
         mItemList=facts;
         mImageLoader= new ImageLoader(context);
+
+        // Use 20% of available heap size as memory cache
+        int maxSize = (int)Runtime.getRuntime().maxMemory()/5;
+        mImageLoader.addMemoryCache(((FactListActivity)context).getSupportFragmentManager(),maxSize);
     }
 
     /**
