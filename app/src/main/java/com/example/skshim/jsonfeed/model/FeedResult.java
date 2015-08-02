@@ -1,4 +1,4 @@
-package com.example.skshim.jsonfeed;
+package com.example.skshim.jsonfeed.model;
 
 import java.util.ArrayList;
 
@@ -23,7 +23,14 @@ public class FeedResult {
     }
 
     public ArrayList<Fact> getRows() {
-        return rows;
+        ArrayList<Fact> filteredFact=new ArrayList<Fact>();
+        for(Fact fact:rows){
+            if(!fact.isNull()){
+                filteredFact.add(fact);
+            }
+        }
+        return filteredFact;
+//        return rows;
     }
 
     public FeedResult setRows(ArrayList<Fact> rows) {
@@ -32,7 +39,9 @@ public class FeedResult {
     }
 
     public FeedResult addItem(Fact item){
-        rows.add(item);
+        if(!item.isNull()){
+            rows.add(item);
+        }
         return this;
     }
 
