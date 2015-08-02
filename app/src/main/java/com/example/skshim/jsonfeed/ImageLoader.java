@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,20 +24,35 @@ import java.net.URL;
 public class ImageLoader {
 
     private Resources mResources;
+    private LruCache<String, BitmapDrawable> mMemoryCache;
 
     public ImageLoader(Context context){
         mResources = context.getResources();
+        // use 20% of available heap size
+        mMemoryCache=new LruCache<String, BitmapDrawable>((int)Runtime.getRuntime().maxMemory()/5);
     }
 
     public void loadImage(String url, ImageView imageView) {
-        final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
 
-        // Make a link between imageView and task that returns bitmap drawable.
-        final DrawableWithAsyncTask drawableWithAsyncTask=
-                new DrawableWithAsyncTask(mResources, null, task);
-        imageView.setImageDrawable(drawableWithAsyncTask);
+        BitmapDrawable bitmap=null;
 
-        task.execute(url);
+        // Check whether imaged is cached in memory.
+        if(mMemoryCache!=null){
+            bitmap = mMemoryCache.get(url);
+        }
+
+        if(bitmap!=null){
+            imageView.setImageDrawable(bitmap);
+        }else{
+            final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+
+            // Make a link between imageView and task that returns bitmap drawable.
+            final DrawableWithAsyncTask drawableWithAsyncTask=
+                    new DrawableWithAsyncTask(mResources, null, task);
+            imageView.setImageDrawable(drawableWithAsyncTask);
+
+            task.execute(url);
+        }
     }
 
     /**
@@ -89,15 +105,22 @@ public class ImageLoader {
          */
         @Override
         protected BitmapDrawable doInBackground(String... urls) {
+            String url = urls[0];
             Bitmap bitmap = null;
             BitmapDrawable drawable = null;
 
-            bitmap = processBitmap(urls[0]);
-            if(bitmap==null){
-                return null;
-            }else{
-                return new BitmapDrawable(mResources, bitmap);
+            bitmap = processBitmap(url);
+
+            if(bitmap!=null){
+                drawable= new BitmapDrawable(mResources, bitmap);
+
+                // Add bitmap to memory cache for future use.
+                if(mMemoryCache!=null){
+                    mMemoryCache.put(url,drawable);
+                }
             }
+
+            return drawable;
         }
 
         @Override
