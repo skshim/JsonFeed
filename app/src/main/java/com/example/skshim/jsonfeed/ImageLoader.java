@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.View;
@@ -24,12 +25,14 @@ import java.net.URL;
 public class ImageLoader {
 
     private Resources mResources;
-    private LruCache<String, BitmapDrawable> mMemoryCache;
+    private MemoryCache<String, BitmapDrawable> mMemoryCache;
 
     public ImageLoader(Context context){
         mResources = context.getResources();
-        // use 20% of available heap size
-        mMemoryCache=new LruCache<String, BitmapDrawable>((int)Runtime.getRuntime().maxMemory()/5);
+    }
+
+    public void addMemoryCache(FragmentManager fragmentManager, int maxSize){
+        mMemoryCache=MemoryCache.getInstance(fragmentManager, maxSize);
     }
 
     public void loadImage(String url, ImageView imageView) {
@@ -174,12 +177,15 @@ public class ImageLoader {
 
         }catch (IOException e) {
             Log.e("processBitmap","error "+e);
-            // Found the below errors while processing url.
-            // FileNotFoundException,SocketTimeoutException,UnknownHostException
+            /**
+             * Found the below errors while processing url.
+             * FileNotFoundException,SocketTimeoutException,UnknownHostException
+             */
             bitmap=null;
         }finally {
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
+            /**
+             * Makes sure that the InputStream is closed after the app is finished using it.
+             */
             if (inputStream != null) {
                 try{
                     inputStream.close();
