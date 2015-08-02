@@ -32,9 +32,6 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
     private ActionBar mActionBar;
     private  String mTitle;
 
-    private final String KEY_TITLE="title";
-    private final String KEY_FACTLIST="fact_list";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,16 +55,17 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
         if(savedInstanceState==null){
             refresh();
         }else{
-            mTitle=savedInstanceState.getString(KEY_TITLE);
+            // Restore saved instance state
+            mTitle=savedInstanceState.getString(Constants.BUNDLE_KEY_TITLE);
+            mFactList=savedInstanceState.getParcelableArrayList(Constants.BUNDLE_KEY_FACTLIST);
+
             mActionBar.setTitle(mTitle);
-            mFactList=savedInstanceState.getParcelableArrayList(KEY_FACTLIST);
             mFactAdapter.setItemList(mFactList);
         }
     }
 
     private void refresh(){
-        String url="https://dl.dropboxusercontent.com/u/746330/facts.json";
-        new JSonFeedTask().execute(url);
+        new JSonFeedTask().execute(Constants.FEED_URL);
     }
 
     @Override
@@ -83,8 +81,8 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(KEY_TITLE, mTitle);
-        outState.putParcelableArrayList(KEY_FACTLIST, mFactList);
+        outState.putString(Constants.BUNDLE_KEY_TITLE, mTitle);
+        outState.putParcelableArrayList(Constants.BUNDLE_KEY_FACTLIST, mFactList);
     }
 
     /**
@@ -152,8 +150,8 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
         try {
             URL url = new URL(myurl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setReadTimeout(Constants.TIME_OUT /* milliseconds */);
+            conn.setConnectTimeout(Constants.TIME_OUT /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 

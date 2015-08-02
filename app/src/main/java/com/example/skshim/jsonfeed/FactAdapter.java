@@ -25,14 +25,14 @@ public class FactAdapter extends ArrayAdapter<Fact> {
         ImageView imageView;
     }
 
-    private List<Fact> mItemList;
+    private List<Fact> mFactList;
     private Context mContext;
     private ImageLoader mImageLoader;
 
     public FactAdapter(Context context, int resource, ArrayList<Fact> facts){
         super(context,resource,facts);
         mContext=context;
-        mItemList=facts;
+        mFactList =facts;
 
         /**
          * Create ImageLoader and config default settings.
@@ -49,10 +49,10 @@ public class FactAdapter extends ArrayAdapter<Fact> {
      */
     @Override
     public int getCount() {
-        if(mItemList==null){
+        if(mFactList ==null){
             return 0;
         }else{
-            return mItemList.size();
+            return mFactList.size();
         }
     }
 
@@ -63,7 +63,7 @@ public class FactAdapter extends ArrayAdapter<Fact> {
      */
     @Override
     public Fact getItem(int position) {
-        return mItemList.get(position);
+        return mFactList.get(position);
     }
 
     /**
@@ -73,7 +73,7 @@ public class FactAdapter extends ArrayAdapter<Fact> {
      */
     @Override
     public long getItemId(int position) {
-        if(mItemList==null){
+        if(mFactList ==null){
             return 0;
         }else{
             return getItem(position).hashCode();
@@ -86,7 +86,7 @@ public class FactAdapter extends ArrayAdapter<Fact> {
      * @param itemList
      */
     public void setItemList(List<Fact> itemList) {
-        mItemList = itemList;
+        mFactList = itemList;
         this.notifyDataSetChanged();
     }
 

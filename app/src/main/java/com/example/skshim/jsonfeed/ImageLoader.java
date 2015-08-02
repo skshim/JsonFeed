@@ -8,9 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.util.LruCache;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 
 import java.io.IOException;
@@ -25,8 +23,8 @@ import java.net.URL;
 public class ImageLoader {
 
     private Resources mResources;
-    private MemoryCache<String, BitmapDrawable> mMemoryCache;
     private Bitmap mLoadingBitmap;
+    private MemoryCache<String, BitmapDrawable> mMemoryCache;
 
     public ImageLoader(Context context){
         mResources = context.getResources();
@@ -44,13 +42,15 @@ public class ImageLoader {
 
         BitmapDrawable bitmap=null;
 
-        // Check whether imaged is cached in memory.
+        // Check whether image is cached in memory.
         if(mMemoryCache!=null){
             bitmap = mMemoryCache.get(url);
         }
 
+        // Use cached image if exist.
         if(bitmap!=null){
             imageView.setImageDrawable(bitmap);
+        // Download from url otherwise.
         }else{
             final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
 
@@ -137,10 +137,6 @@ public class ImageLoader {
             final ImageView imageView = getAttachedImageView();
             if (drawable != null && imageView != null) {
                 imageView.setImageDrawable(drawable);
-            }else{
-//                if(imageView!=null){
-//                    imageView.setVisibility(View.GONE);
-//                }
             }
         }
 
@@ -166,8 +162,8 @@ public class ImageLoader {
         try {
             URL url = new URL(imageUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(1000 /* milliseconds */);
-            conn.setConnectTimeout(1000 /* milliseconds */);
+            conn.setReadTimeout(Constants.TIME_OUT /* milliseconds */);
+            conn.setConnectTimeout(Constants.TIME_OUT /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 
