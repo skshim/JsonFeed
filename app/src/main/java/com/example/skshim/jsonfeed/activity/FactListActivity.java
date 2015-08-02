@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.widget.ListView;
 
 import com.example.skshim.jsonfeed.R;
@@ -30,6 +31,9 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_json_feed);
 
+        // Set Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         mActionBar=getSupportActionBar();
 
         // Config swip layout
@@ -46,6 +50,7 @@ public class FactListActivity extends AppCompatActivity implements  SwipeRefresh
         listView.setAdapter(mFactAdapter);
 
         if(savedInstanceState==null){
+            // A little bit of delay will enable refreshing animation when launch the app.
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
