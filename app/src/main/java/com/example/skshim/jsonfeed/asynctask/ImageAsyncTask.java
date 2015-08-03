@@ -116,13 +116,21 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
             conn.connect();
             int response = conn.getResponseCode();
 
+            // Handle redirect code 301: Moved Permanently
+            if (response / 100 == 3) {
+                String redirectUrlString = conn.getHeaderField("Location");
+                URL redirectUrl = new URL(redirectUrlString);
+                conn = (HttpURLConnection) redirectUrl.openConnection();
+                conn.connect();
+            }
+
             inputStream = conn.getInputStream();
 
             // Decoding stream data back into image Bitmap that android understands.
             bitmap = BitmapFactory.decodeStream(inputStream);
 
         }catch (IOException e) {
-            Log.e("processBitmap", "error " + e);
+            Log.e("processBitmap", "error " + e+" "+imageUrl);
             /**
              * Found the below errors while processing url.
              * FileNotFoundException,SocketTimeoutException,UnknownHostException
