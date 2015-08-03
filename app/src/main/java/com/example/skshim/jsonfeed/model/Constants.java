@@ -12,7 +12,7 @@ public final class Constants {
     public static final String BUNDLE_KEY_TITLE="title";
     public static final String BUNDLE_KEY_FACTLIST="fact_list";
 
-    public static int TIME_OUT=5000;
+    public static int TIME_OUT=2500;
     public static int LOADING_DELAY=300;
 
 }

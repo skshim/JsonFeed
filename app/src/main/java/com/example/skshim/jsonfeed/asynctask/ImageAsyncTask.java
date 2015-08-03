@@ -109,6 +109,8 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(Constants.TIME_OUT /* milliseconds */);
             conn.setConnectTimeout(Constants.TIME_OUT /* milliseconds */);
+            conn.addRequestProperty("Accept-Encoding", "identity");
+            conn.addRequestProperty("User-Agent", System.getProperty("http.agent"));
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
 
@@ -121,6 +123,8 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
                 String redirectUrlString = conn.getHeaderField("Location");
                 URL redirectUrl = new URL(redirectUrlString);
                 conn = (HttpURLConnection) redirectUrl.openConnection();
+                conn.addRequestProperty("Accept-Encoding", "identity");
+                conn.addRequestProperty("User-Agent", System.getProperty("http.agent"));
                 conn.connect();
             }
 
