@@ -50,7 +50,7 @@ public class ImageLoader {
         if(bitmap!=null){
             imageView.setImageDrawable(bitmap);
 
-        }else{
+        }else if(isNotProcessing(url,imageView)){
             // Download from url otherwise.
             final ImageAsyncTask imageTask = new ImageAsyncTask(mResources,imageView,
                     new ImageAsyncTask.OnImageDownloadListener(){
@@ -88,6 +88,22 @@ public class ImageLoader {
         public ImageAsyncTask getWorkerTask() {
             return bitmapWorkerTaskReference.get();
         }
+    }
+
+    /**
+     * Returns true if there was no work in progress on this image view.
+     * Returns false if the work in progress deals with the same data.
+     */
+    public static boolean isNotProcessing(String url, ImageView imageView) {
+        final ImageAsyncTask imageAsyncTask = ImageAsyncTask.getAttachedWorkerTask(imageView);
+        if (imageAsyncTask != null) {
+            final String urlFromTask = imageAsyncTask.getmUrl();
+            if (urlFromTask != null && urlFromTask.equals(url)) {
+                // The same work is already in progress.
+                return false;
+            }
+        }
+        return true;
     }
 
 }

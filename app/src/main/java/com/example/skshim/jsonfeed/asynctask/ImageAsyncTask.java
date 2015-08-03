@@ -89,7 +89,7 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
      * Retrieve the currently active work task (if any) associated with this imageView.
      * null if there is no such task.
      */
-    private static ImageAsyncTask getAttachedWorkerTask(ImageView imageView) {
+    public static ImageAsyncTask getAttachedWorkerTask(ImageView imageView) {
         if (imageView != null) {
             final Drawable drawable = imageView.getDrawable();
             if (drawable instanceof ImageLoader.DrawableWithAsyncTask) {
@@ -140,6 +140,8 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
             return bitmap;
         }
     }
+
+    public String getmUrl(){return mUrl;}
 
     /**
      * Interface definition for a callback to be invoked when a image download is finished.
