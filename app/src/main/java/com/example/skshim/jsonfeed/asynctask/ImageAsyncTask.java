@@ -23,7 +23,7 @@ import java.net.URL;
  *
  * The actual AsyncTask that will asynchronously process the image.
  */
-public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
+public class ImageAsyncTask extends AsyncTask<Void, Void, BitmapDrawable> {
 
     public static final String TAG="ImageAsyncTask";
 
@@ -32,9 +32,10 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
     private OnImageDownloadListener mOnImageDownloadListener;
     private String mUrl;
 
-    public ImageAsyncTask(Resources resources, ImageView imageView, OnImageDownloadListener listener) {
+    public ImageAsyncTask(Resources resources, String url, ImageView imageView, OnImageDownloadListener listener) {
         mResources = resources;
         mOnImageDownloadListener=listener;
+        mUrl = url;
         // Use a WeakReference to ensure the ImageView can be garbage collected
         imageViewReference = new WeakReference<ImageView>(imageView);
     }
@@ -43,8 +44,7 @@ public class ImageAsyncTask extends AsyncTask<String, Void, BitmapDrawable> {
      * Background processing.
      */
     @Override
-    protected BitmapDrawable doInBackground(String... urls) {
-        mUrl = urls[0];
+    protected BitmapDrawable doInBackground(Void... params) {
 
         Bitmap bitmap = null;
         BitmapDrawable drawable = null;

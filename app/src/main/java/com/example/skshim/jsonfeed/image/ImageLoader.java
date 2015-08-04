@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.widget.ImageView;
 
@@ -52,7 +54,7 @@ public class ImageLoader {
 
         }else if(isNotProcessing(url,imageView)){
             // Download from url otherwise.
-            final ImageAsyncTask imageTask = new ImageAsyncTask(mResources,imageView,
+            final ImageAsyncTask imageTask = new ImageAsyncTask(mResources,url,imageView,
                     new ImageAsyncTask.OnImageDownloadListener(){
                         @Override
                         public void onImageDownload(String url, BitmapDrawable drawable) {
@@ -68,7 +70,19 @@ public class ImageLoader {
                     new DrawableWithAsyncTask(mResources, mLoadingBitmap, imageTask);
             imageView.setImageDrawable(drawableWithAsyncTask);
 
-            imageTask.execute(url);
+            /**
+             * http://developer.android.com/reference/android/os/AsyncTask.html
+             *
+             * When first introduced, AsyncTasks were executed serially on a single background thread.
+             * Starting with DONUT, this was changed to a pool of threads allowing multiple tasks to operate in parallel.
+             * Starting with HONEYCOMB, tasks are executed on a single thread to avoid common application errors caused by parallel execution.
+             * If you truly want parallel execution, you can invoke executeOnExecutor(java.util.concurrent.Executor, Object[]) with THREAD_POOL_EXECUTOR.
+             */
+            if(Build.VERSION.SDK_INT>Build.VERSION_CODES.HONEYCOMB){
+                imageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }else{
+                imageTask.execute();
+            }
         }
     }
 
