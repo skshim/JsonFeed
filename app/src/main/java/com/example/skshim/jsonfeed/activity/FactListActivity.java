@@ -59,21 +59,30 @@ public class FactListActivity extends AppCompatActivity {
         listView.setAdapter(mFactAdapter);
 
         if(savedInstanceState==null){
-            // A little bit of delay will enable refreshing animation when launch the app.
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    refresh();
-                }
-            }, Constants.LOADING_DELAY);
+            firstRefresh();
         }else{
             // Restore saved instance state
             mTitle=savedInstanceState.getString(Constants.BUNDLE_KEY_TITLE);
             mFactList=savedInstanceState.getParcelableArrayList(Constants.BUNDLE_KEY_FACTLIST);
 
-            mActionBar.setTitle(mTitle);
-            mFactAdapter.setItemList(mFactList);
+            // Need to start again when rotates screen while downloading json feed
+            if(mTitle==null){
+                firstRefresh();
+            }else{
+                mActionBar.setTitle(mTitle);
+                mFactAdapter.setItemList(mFactList);
+            }
         }
+    }
+
+    private void firstRefresh(){
+        // A little bit of delay will enable refreshing animation when launch the app.
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        }, Constants.LOADING_DELAY);
     }
 
     // Refresh only when network is connected.
