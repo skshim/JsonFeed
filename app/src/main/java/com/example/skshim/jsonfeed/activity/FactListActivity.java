@@ -28,7 +28,9 @@ public class FactListActivity extends AppCompatActivity {
     private ArrayList<Fact> mFactList;
     private FactAdapter mFactAdapter;
     private ActionBar mActionBar;
-    private  String mTitle;
+    private String mTitle;
+    private FactAsyncTask mFactAsyncTask;
+    private FactAsyncTask.OnFeedResultListener mOnFeedResultListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,7 @@ public class FactListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         mActionBar=getSupportActionBar();
 
-        // Config swip layout
+        // Config swap layout
         mSwiptLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mSwiptLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
@@ -58,16 +60,45 @@ public class FactListActivity extends AppCompatActivity {
         ListView listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(mFactAdapter);
 
+        // Create OnFeedResultListener
+        mOnFeedResultListener=new FactAsyncTask.OnFeedResultListener() {
+            @Override
+            public void onFeedResult(FeedResult feedResult) {
+                // Disconnect as all work has been done.
+                mFactAsyncTask.disconnect();
+                mFactAsyncTask = null;
+
+                displayFeed(feedResult);
+                mSwiptLayout.setRefreshing(false);
+            }
+        };
+
         if(savedInstanceState==null){
-            firstRefresh();
+            // A little bit of delay will enable refreshing animation when launch the app.
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    refresh();
+                }
+            }, Constants.LOADING_DELAY);
         }else{
             // Restore saved instance state
             mTitle=savedInstanceState.getString(Constants.BUNDLE_KEY_TITLE);
             mFactList=savedInstanceState.getParcelableArrayList(Constants.BUNDLE_KEY_FACTLIST);
 
+            // Restore saved AsyncTask
+            mFactAsyncTask =(FactAsyncTask)getLastCustomNonConfigurationInstance();
+            if(mFactAsyncTask !=null){
+                /**
+                 * If FactAsyncTask is still in progress,
+                 * it should be reconnected with new activity and OnFeedResultListener.
+                 */
+                mFactAsyncTask.connect(this, mOnFeedResultListener);
+            }
+
             // Need to start again when rotates screen while downloading json feed
             if(mTitle==null){
-                firstRefresh();
+                mActionBar.setTitle(R.string.loading);
             }else{
                 mActionBar.setTitle(mTitle);
                 mFactAdapter.setItemList(mFactList);
@@ -75,31 +106,42 @@ public class FactListActivity extends AppCompatActivity {
         }
     }
 
-    private void firstRefresh(){
-        // A little bit of delay will enable refreshing animation when launch the app.
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refresh();
-            }
-        }, Constants.LOADING_DELAY);
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        // Return FactAsnycTask. It will be used when rotate screen if it is still in progress.
+        return mFactAsyncTask;
     }
 
-    // Refresh only when network is connected.
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Constants.BUNDLE_KEY_TITLE, mTitle);
+        outState.putParcelableArrayList(Constants.BUNDLE_KEY_FACTLIST, mFactList);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mFactAsyncTask !=null){
+            // Disconnect if still in progress.
+            mFactAsyncTask.disconnect();
+        }
+    }
+
     private void refresh() {
-        if (isConnected()) {
+        // Refresh only when network is connected.
+        if (isConnectedToInternet()) {
             if (!mSwiptLayout.isRefreshing()) {
                 mSwiptLayout.setRefreshing(true);
             }
             mActionBar.setTitle(R.string.loading);
-            new FactAsyncTask(this, new FactAsyncTask.OnFeedResultListener() {
-                @Override
-                public void onFeedResult(FeedResult feedResult) {
-                    displayFeed(feedResult);
-                    mSwiptLayout.setRefreshing(false);
-                }
-            }).execute(Constants.FEED_URL);
+
+            // Create FactAsnycTask and connect with Activity and OnFeedResultListener
+            mFactAsyncTask=new FactAsyncTask();
+            mFactAsyncTask.connect(this,mOnFeedResultListener);
+            mFactAsyncTask.execute(Constants.FEED_URL);
         }else{
+            // Otherwise show display message.
             if (mSwiptLayout.isRefreshing()) {
                 mSwiptLayout.setRefreshing(false);
             }
@@ -110,22 +152,10 @@ public class FactListActivity extends AppCompatActivity {
     }
 
     // Check if network is available.
-    private boolean isConnected(){
+    private boolean isConnectedToInternet(){
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-    }
-
-    /**
-     * Save all appropriate fragment state.
-     *
-     * @param outState
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(Constants.BUNDLE_KEY_TITLE, mTitle);
-        outState.putParcelableArrayList(Constants.BUNDLE_KEY_FACTLIST, mFactList);
     }
 
     // Provide feed result to FactAdapter.
@@ -146,5 +176,4 @@ public class FactListActivity extends AppCompatActivity {
             mFactAdapter.setItemList(mFactList);
         }
     }
-
 }

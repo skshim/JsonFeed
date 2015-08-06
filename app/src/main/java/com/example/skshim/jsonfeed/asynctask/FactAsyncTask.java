@@ -29,11 +29,18 @@ public class FactAsyncTask extends AsyncTask<String, Void, String> {
     private OnFeedResultListener mFeedListener;
     private boolean error = true;
 
-    public FactAsyncTask(Context context, OnFeedResultListener feedListener) {
-        mContext = context;
-        mFeedListener = feedListener;
+    public FactAsyncTask() {
     }
 
+    public void connect(Context context, OnFeedResultListener feedListener){
+        mContext=context;
+        mFeedListener=feedListener;
+    }
+
+    public void disconnect(){
+        mContext=null;
+        mFeedListener=null;
+    }
 
     @Override
     protected String doInBackground(String... urls) {
@@ -50,10 +57,11 @@ public class FactAsyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        if (error) {
+        if (error && mContext!=null) {
             Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
         }
 
+        // Provide Feed Result to UI Thread.
         if (mFeedListener != null) {
             FeedResult feedResult = null;
             if (!error && !TextUtils.isEmpty(result)){
