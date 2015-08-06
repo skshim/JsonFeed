@@ -96,7 +96,6 @@ public class FactListActivity extends AppCompatActivity {
                 mFactAsyncTask.connect(this, mOnFeedResultListener);
             }
 
-            // Need to start again when rotates screen while downloading json feed
             if(mTitle==null){
                 mActionBar.setTitle(R.string.loading);
             }else{
